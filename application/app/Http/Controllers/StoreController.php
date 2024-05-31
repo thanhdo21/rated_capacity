@@ -41,14 +41,15 @@ class StoreController extends Controller
 
     public function update(Request $request, Store $store)
     {
-        $this->authorize('update', $store);
-
+        
         $request->validate([
             'store_name' => 'sometimes|required|string|max:255',
             'store_address' => 'sometimes|required|string|max:255',
             'store_phone' => 'sometimes|required|string|max:15',
             'store_email' => 'sometimes|required|string|email|max:255',
         ]);
+        
+        $this->authorize('update', $store);
 
         $store->update($request->all());
         return response()->json($store);

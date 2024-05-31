@@ -11,7 +11,6 @@ class ProductController extends Controller
 
     public function __construct()
     {
-        $this->authorizeResource(Product::class);
     }
     public function index(Request $request)
     {
@@ -42,7 +41,7 @@ class ProductController extends Controller
 
     public function show(Product $product)
     {
-
+        $this->authorize('view', $product);
         return response()->json($product);
     }
 
@@ -56,12 +55,7 @@ class ProductController extends Controller
             'store_id' => 'sometimes|required|exists:stores,id',
         ]);
 
-        if ($request->store_id) {
-            $store = Store::findOrFail($request->store_id);
-            if ($store->user_id !== $request->user()->id) {
-                return response()->json(['error' => 'Unauthorized'], 403);
-            }
-        }
+        $this->authorize('update', $product);
 
         $product->update($request->all());
 
@@ -69,7 +63,9 @@ class ProductController extends Controller
     }
 
     public function destroy(Product $product)
-    {
+    {   
+        $this->authorize('delete', $product);
+
         $product->delete();
 
         return response()->json(['message' => 'Product deleted successfully']);
